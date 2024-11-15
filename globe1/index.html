@@ -1,0 +1,140 @@
+<head>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.2);
+                opacity: 0.5;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+    </style>
+    <script src="//unpkg.com/d3-dsv"></script>
+    <script src="//unpkg.com/index-array-by"></script>
+    <script src="//unpkg.com/globe.gl"></script>
+</head>
+
+<body>
+    <div id="globeViz"></div>
+
+    <script>
+        const OPACITY = 0.22;
+        const DELAY = 100; // Animation delay for airplane
+
+        const myGlobe = Globe()(document.getElementById('globeViz'))
+            .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+            .pointOfView({ lat: 20.5937, lng: 78.9629, altitude: 2 }) // aim at India
+            .arcLabel(d => `${d.airline}: ${d.srcIata} &#8594; ${d.dstIata}`)
+            .arcStartLat(d => +d.srcAirport.lat)
+            .arcStartLng(d => +d.srcAirport.lng)
+            .arcEndLat(d => +d.dstAirport.lat)
+            .arcEndLng(d => +d.dstAirport.lng)
+            .arcDashLength(0.25)
+            .arcDashGap(1)
+            .arcDashInitialGap(() => Math.random())
+            .arcDashAnimateTime(4000)
+            .arcColor(d => [`rgba(0, 255, 0, ${OPACITY})`, `rgba(255, 0, 0, ${OPACITY})`])
+            .arcsTransitionDuration(0)
+            .pointsMerge(true);
+
+        // Coordinates for Delhi and Bengaluru
+        const delhi = { lat: 28.6139, lng: 77.2090 }; // Delhi coordinates
+        const bangalore = { lat: 12.9716, lng: 77.5946 }; // Bengaluru coordinates
+
+        // Add curved path between Delhi and Bengaluru
+        myGlobe.arcData([
+            {
+                srcAirport: delhi,
+                dstAirport: bangalore,
+                airline: 'Custom Route',
+                srcIata: 'DEL',
+                dstIata: 'BLR',
+                stops: '0'
+            }
+        ]);
+
+        // Add points for departure and destination
+        myGlobe.pointData([
+            { lat: delhi.lat, lng: delhi.lng, color: 'red', radius: 0.1 },
+            { lat: bangalore.lat, lng: bangalore.lng, color: 'blue', radius: 0.1 }
+        ]);
+
+        // Pulse effect for departure and destination points
+        const points = myGlobe.pointData();
+        points.forEach(point => {
+            if (point.color === 'red') {
+                point.pulse = true; // Add pulse effect to departure point
+            }
+        });
+
+        // Airplane Animation
+        const airplane = document.createElement('img');
+        airplane.src = 'https://upload.wikimedia.org/wikipedia/commons/7/77/Plane_icon.png'; // Airplane icon
+        airplane.style.position = 'absolute';
+        airplane.style.width = '30px';
+        airplane.style.transform = 'translate(-50%, -50%)';
+        document.body.appendChild(airplane);
+
+        const animateAirplane = () => {
+            const start = [delhi.lng, delhi.lat];
+            const end = [bangalore.lng, bangalore.lat];
+            const duration = 4000; // Duration of the animation
+
+            let startTime;
+            const animate = (time) => {
+                if (!startTime) startTime = time;
+                const elapsed = time - startTime;
+                const t = Math.min(elapsed / duration, 1);
+                const lat = start[1] + (end[1] - start[1]) * t;
+                const lng = start[0] + (end[0] - start[0]) * t;
+
+                airplane.style.left = `${window.innerWidth / 2 + lng * 100}px`;
+                airplane.style.top = `${window.innerHeight / 2 - lat * 100}px`;
+
+                if (t < 1) {
+                    requestAnimationFrame(animate);
+                }
+            };
+            requestAnimationFrame(animate);
+        };
+
+        animateAirplane();
+
+        // Random weather effects
+        const addWeatherEffect = () => {
+            const cloud = document.createElement('div');
+            cloud.style.position = 'absolute';
+            cloud.style.width = '100px';
+            cloud.style.height = '60px';
+            cloud.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+            cloud.style.borderRadius = '50%';
+            cloud.style.opacity = '0.8';
+            cloud.style.left = `${Math.random() * window.innerWidth}px`;
+            cloud.style.top = `${Math.random() * window.innerHeight}px`;
+            document.body.appendChild(cloud);
+
+            setTimeout(() => {
+                cloud.remove();
+            }, 2000);
+        };
+
+        setInterval(addWeatherEffect, 3000); // Add weather effects every 3 seconds
+
+    </script>
+</body>
