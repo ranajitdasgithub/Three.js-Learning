@@ -1,0 +1,21 @@
+{
+  "name": "aframe",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "aframe": "^1.6.0",
+    "three": "^0.170.0",
+    "three-globe": "^2.34.4"
+  },
+  "devDependencies": {
+    "parcel": "^2.13.0"
+  }
+}

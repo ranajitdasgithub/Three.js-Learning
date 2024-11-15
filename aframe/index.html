@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A-Frame Box and Globe</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three-globe@2.24.0/three-globe.min.js"></script>
+    <script>
+        // Register the add-box component
+        AFRAME.registerComponent('add-box', {
+            schema: {
+                position: { type: 'vec3', default: { x: 0, y: 1, z: -5 } },
+                color: { type: 'string', default: '#4CC3D9' }
+            },
+            init: function () {
+                const data = this.data;
+                const el = this.el;
+
+                // Create a box element
+                const box = document.createElement('a-box');
+                box.setAttribute('position', data.position);
+                box.setAttribute('color', data.color);
+                box.setAttribute('shadow', '');
+
+                // Append the box to the entity
+                el.appendChild(box);
+            }
+        });
+
+        // Initialize the A-Frame scene
+        window.onload = function () {
+            const scene = document.querySelector('a-scene');
+
+            // Add the box component to the scene
+            const entity = document.createElement('a-entity');
+            entity.setAttribute('add-box', 'position: 1 0.5 -3; color: #FFC65D');
+            scene.appendChild(entity);
+
+            // Create the globe using Three.js and Three-Globe
+            const globeEntity = document.createElement('a-entity');
+            globeEntity.setAttribute('id', 'globe');
+            scene.appendChild(globeEntity);
+
+            const globe = new Globe()
+                .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg') // Image for globe texture
+                .bordersColor('rgba(200, 200, 200, 0.2)')
+                .showGraticules(false)
+                .scale(1.5);
+
+            // Access the Three.js scene of the A-Frame entity
+            const threeScene = globeEntity.object3D;
+            threeScene.add(globe);
+
+            // Add lighting
+            const light = new THREE.PointLight(0xffffff, 1, 100);
+            light.position.set(5, 5, 5);
+            threeScene.add(light);
+        };
+    </script>
+</head>
+
+<body>
+    <a-scene background="color: black">
+        <a-camera>
+            <a-cursor color="white"></a-cursor>
+        </a-camera>
+    </a-scene>
+</body>
+
+</html>

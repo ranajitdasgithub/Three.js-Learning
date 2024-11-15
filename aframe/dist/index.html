@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A-Frame Box Component</title>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script>// Register the add-box component
+AFRAME.registerComponent('add-box', {
+    schema: {
+        position: {
+            type: 'vec3',
+            default: {
+                x: 0,
+                y: 1,
+                z: -5
+            }
+        },
+        color: {
+            type: 'string',
+            default: '#4CC3D9'
+        }
+    },
+    init: function() {
+        const data = this.data;
+        const el = this.el;
+        // Create a box element
+        const box = document.createElement('a-box');
+        box.setAttribute('position', data.position);
+        box.setAttribute('color', data.color);
+        box.setAttribute('shadow', '');
+        // Append the box to the entity
+        el.appendChild(box);
+    }
+});
+// Initialize the A-Frame scene
+window.onload = function() {
+    const scene = document.querySelector('a-scene');
+    const entity = document.createElement('a-entity');
+    entity.setAttribute('add-box', 'position: 1 0.5 -3; color: #FFC65D');
+    scene.appendChild(entity);
+};
+
+</script>
+</head>
+
+<body>
+    <a-scene background="color: black">
+        <a-camera>
+            <a-cursor color="white"></a-cursor>
+        </a-camera>
+    </a-scene>
+<script src="/aframe.3464ddca.js"></script></body>
+
+</html>
